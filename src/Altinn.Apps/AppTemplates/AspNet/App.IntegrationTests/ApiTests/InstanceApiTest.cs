@@ -85,6 +85,7 @@ namespace App.IntegrationTests
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             Assert.NotNull(instance);
             Assert.Equal("1000", instance.InstanceOwner.PartyId);
+            Assert.Equal("Task_1", instance.Process.CurrentTask.ElementId);
 
             TestDataUtil.DeletInstanceAndData("tdd", "endring-av-navn", 1000, new Guid(instance.Id.Split('/')[1]));
         }
