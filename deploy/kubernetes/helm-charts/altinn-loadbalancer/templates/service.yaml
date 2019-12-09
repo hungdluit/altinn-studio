@@ -15,4 +15,3 @@ spec:
   selector:
     run: altinn-loadbalancer
   type: {{ .Values.service.type }}
-  loadBalancerIP: {{ required ".Values.loadBalancerIP must be set" .Values.loadBalancerIP }}

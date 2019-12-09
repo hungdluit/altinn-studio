@@ -20,7 +20,7 @@ volumes:
       name: loadbalancer-config
   - name: altinn-loadbalancer-ssl
     secret:
-      secretName: ssl-key-secret
+      secretName: ssl-cert
 
 service:
   type: LoadBalancer

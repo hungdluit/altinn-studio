@@ -9,11 +9,13 @@ data:
     events { worker_connections 1024; }
 
     http {
+      fastcgi_read_timeout 300;
+      proxy_read_timeout 300;
 
       client_max_body_size 50M;
 
       upstream designer {
-        server altinn-designer:5000;
+        server altinn-designer:3000;
       }
 
       upstream repositories {
@@ -34,18 +36,17 @@ data:
       server {
         listen 443 ssl http2;
 
-        ssl_protocols TLSv1.1 TLSv1.2;
+        ssl_protocols TLSv1.2 TLSv1.3;
 
         ssl_prefer_server_ciphers on;
         ssl_ciphers ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DH+3DES:!ADH:!AECDH:!MD5;
 
-        ssl_certificate /etc/nginx/ssl/altinn_studio/ssl-bundle.crt;
-        ssl_certificate_key /etc/nginx/ssl/altinn_studio/altinn.studio.rsa;
-        ssl_dhparam /etc/nginx/ssl/altinn_studio/dhparam.pem;
-
+        ssl_certificate /etc/nginx/ssl/altinn_studio/altinn.studio.crt;
+        ssl_certificate_key /etc/nginx/ssl/altinn_studio/altinn.studio.key;
+        # ssl_dhparam /etc/nginx/ssl/altinn_studio/dhparam.pem;
         ssl_stapling on;
         ssl_stapling_verify on;
-        ssl_trusted_certificate /etc/nginx/ssl/altinn_studio/ssl-bundle.crt;
+        ssl_trusted_certificate /etc/nginx/ssl/altinn_studio/altinn.studio.crt;
 
         ssl_session_cache   shared:SSL:40m;
         ssl_session_timeout 4h;
@@ -64,6 +65,7 @@ data:
           proxy_pass 			    http://designer/;
           proxy_set_header 	  Host dev.altinn.studio;
           proxy_set_header 	  X-Forwarded-For $remote_addr;
+
         }
 
         location /Home/  {
