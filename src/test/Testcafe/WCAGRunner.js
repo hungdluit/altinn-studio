@@ -8,7 +8,7 @@ createTestCafe()
     const runner = testcafe.createRunner();
 
     return runner
-      .browsers(['puppeteer:no_sandbox'])
+      .browsers(['chrome:headless'])
       .concurrency(1)
       .screenshots('./screenshots', { takeOnFails: false })
       .reporter('spec')
