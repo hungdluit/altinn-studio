@@ -32,9 +32,9 @@ function* submitFormSaga({ url, apiMode }: ISubmitDataAction): SagaIterator {
       state.language.language);
     const componentSpesificValidations =
       validateFormComponents(state.attachments.attachments, state.formLayout.layout,
-        state.language.language);
+        state.language.language, state.formLayout.uiConfig.hiddenFields);
     const emptyFieldsValidations =
-      validateEmptyFields(state.formData.formData, state.formLayout.layout, state.language.language);
+      validateEmptyFields(state.formData.formData, state.formLayout.layout, state.language.language, state.formLayout.uiConfig.hiddenFields);
 
     validations = Object.assign(validations, componentSpesificValidations);
     if (apiMode === 'Complete') {
@@ -47,8 +47,16 @@ function* submitFormSaga({ url, apiMode }: ISubmitDataAction): SagaIterator {
         state.applicationMetadata.applicationMetadata,
         state.instanceData.instance,
         );
-      yield call(put, dataElementUrl(defaultDataElementGuid), model);
-
+      try {
+        yield call(put, dataElementUrl(defaultDataElementGuid), model);
+      } catch (err) {
+        if (err.response && err.response.status === 303) {
+          yield call(FormDataActions.fetchFormData, dataElementUrl(err.response.data.id));
+        } else {
+          throw err;
+        }
+      }
+      
       if (apiMode === 'Complete') {
         // run validations against the datamodel
         const instanceId = state.instanceData.instance.id;
@@ -73,9 +81,6 @@ function* submitFormSaga({ url, apiMode }: ISubmitDataAction): SagaIterator {
   } catch (err) {
     console.error(err);
     yield call(FormDataActions.submitFormDataRejected, err);
-    if (err.response && err.response.status === 303) {
-      yield call(FormDataActions.fetchFormData, dataElementUrl(err.response.data.id));
-    }
   }
 }
 

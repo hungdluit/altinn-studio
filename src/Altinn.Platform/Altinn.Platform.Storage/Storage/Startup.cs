@@ -113,6 +113,7 @@ namespace Altinn.Platform.Storage
                 options.AddPolicy(AuthzConstants.POLICY_INSTANCE_READ, policy => policy.Requirements.Add(new AppAccessRequirement("read")));
                 options.AddPolicy(AuthzConstants.POLICY_INSTANCE_WRITE, policy => policy.Requirements.Add(new AppAccessRequirement("write")));
                 options.AddPolicy(AuthzConstants.POLICY_SCOPE_APPDEPLOY, policy => policy.Requirements.Add(new ScopeAccessRequirement("altinn:appdeploy")));
+                options.AddPolicy(AuthzConstants.POLICY_SCOPE_INSTANCE_READ, policy => policy.Requirements.Add(new ScopeAccessRequirement("altinn:instances.read")));
             });
 
             services.AddSingleton<IDataRepository, DataRepository>();
@@ -126,10 +127,9 @@ namespace Altinn.Platform.Storage
             services.AddTransient<IAuthorizationHandler, AppAccessHandler>();
             services.AddTransient<IAuthorizationHandler, ScopeAccessHandler>();
 
-            services.AddSingleton(typeof(ITelemetryChannel), new ServerTelemetryChannel() { StorageFolder = "/tmp/logtelemetry" });
-
             if (!string.IsNullOrEmpty(ApplicationInsightsKey))
             {
+                services.AddSingleton(typeof(ITelemetryChannel), new ServerTelemetryChannel() { StorageFolder = "/tmp/logtelemetry" });
                 services.AddApplicationInsightsTelemetry(ApplicationInsightsKey);
 
                 _logger.Information($"Startup // ApplicationInsightsTelemetryKey = {ApplicationInsightsKey}");
