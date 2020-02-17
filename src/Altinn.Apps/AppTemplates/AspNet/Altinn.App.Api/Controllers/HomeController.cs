@@ -26,15 +26,15 @@ namespace Altinn.App.Api.Controllers
         [Route("{org}/{app}/{instanceId}")]
         public IActionResult Index([FromRoute] string org, [FromRoute] string app, [FromRoute] Guid? instanceId)
         {
-            // See comments in the configuration of Antiforgery in MvcConfiguration.cs.
-            var tokens = _antiforgery.GetAndStoreTokens(HttpContext);
-            HttpContext.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken, new CookieOptions
-            {
-                HttpOnly = false // Make this cookie readable by Javascript.
-            });
-
             if (User.Identity.IsAuthenticated)
             {
+                // See comments in the configuration of Antiforgery in MvcConfiguration.cs.
+                AntiforgeryTokenSet tokens = _antiforgery.GetAndStoreTokens(HttpContext);
+                HttpContext.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken, new CookieOptions
+                {
+                    HttpOnly = false // Make this cookie readable by Javascript.
+                });
+
                 ViewBag.org = org;
                 ViewBag.app = app;
                 return PartialView("Index");
